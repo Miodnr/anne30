@@ -393,10 +393,21 @@
 
     /* Footer */
     .footer {
+      padding: 20px 40px 32px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer .footer-note {
+      background: #e8f5e9;
+      border: 1px solid #c8e6c9;
+      border-radius: 18px;
+      padding: 16px 22px;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: #2e7d32;
+      font-weight: 500;
       text-align: center;
-      padding: 12px 20px 28px;
-      font-size: 1.05rem;
-      color: #81c784;
     }
 
     @media (max-width: 500px) {
@@ -407,6 +418,7 @@
       .message { padding: 22px 22px 24px; }
       .form-section { padding: 24px 22px 36px; }
       .buffet-grid { grid-template-columns: 1fr; }
+      .footer { padding: 16px 22px 28px; }
     }
 
     /* ── Password gate ── */
@@ -837,7 +849,7 @@
         <label for="notcoming">Ich kann leider nicht</label>
       </div>
 
-      <label class="field-label">Bringst du was fürs Buffet mit?</label>
+      <label class="field-label">Bringst du was fürs Buffet mit? (eine Option)</label>
       <div class="buffet-grid">
 
         <div class="buffet-item" id="item-brot">
@@ -911,7 +923,9 @@
     </div>
   </div>
 
-  <div class="footer">...und falls du überlegst was du mir schenken könntest:<br> Ich würde mich sehr über Geld freuen - es sei denn, du hast eine mega krasse, tolle, super passende Geschenkidee für mich, worüber ich mich zu 100% ebenfalls freuen würde,😂🫶🏻</div>
+  <div class="footer">
+    <p class="footer-note">...und falls du überlegst was du mir schenken könntest:<br> Ich würde mich sehr über Geld freuen - es sei denn, du hast eine mega krasse, tolle, super passende Geschenkidee für mich, worüber ich mich zu 100% ebenfalls freuen würde. 😂🫶🏻</p>
+  </div>
 
 </div>
 <script>
@@ -938,6 +952,16 @@
 
   const LOCAL_KEY = 'anne30_buffet_v1';
   let counts = { brot: 0, salat: 0, dips: 0, snacks: 0, nachtisch: 0 };
+
+  // ── Buffet: nur eine Option gleichzeitig auswählbar ──
+  document.querySelectorAll('input[name="buffet"]').forEach(box => {
+    box.addEventListener('change', () => {
+      if (!box.checked) return;
+      document.querySelectorAll('input[name="buffet"]').forEach(other => {
+        if (other !== box) other.checked = false;
+      });
+    });
+  });
 
   async function loadCounts() {
     if (DB_URL) {
@@ -1146,15 +1170,6 @@
         });
       } catch {}
     }
-
-    const subject = encodeURIComponent(`Geburtstagsanmeldung – ${name}`);
-    const body    = encodeURIComponent(
-      `Name: ${name}\n` +
-      `Teilnahme: ${attendance === 'komme' ? 'Ich komme! 🎉' : 'Ich kann leider nicht kommen.'}\n` +
-      (labels.length ? `Bringe mit fürs Buffet: ${labels.join(', ')}\n` : 'Bringe nichts mit.\n')
-    );
-
-    window.location.href = `mailto:matzeunddonnie@gmail.com?subject=${subject}&body=${body}`;
 
     document.getElementById('rsvpForm').style.display = 'none';
     document.getElementById('successBox').style.display = 'block';
